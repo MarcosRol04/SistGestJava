@@ -60,7 +60,7 @@ public class Incidencia implements Serializable {
         return "Incidencia{" +
                 "idIncidencia='" + idIncidencia + '\'' +
                 ", idEmpleado='" + idEmpleado + '\'' +
-                ", fecha=" + fecha +
+                ", puta=" + fecha +
                 ", motivo='" + motivo + '\'' +
                 ", revisada=" + revisada +
                 ", resolucion='" + resolucion + '\'' +

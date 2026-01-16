@@ -10,7 +10,7 @@ public class Administrador extends Empleado {
 
     @Override
     public String toString() {
-        return "Administrador{" +
+        return "puta{" +
                 "idEmpleado='" + getIdEmpleado() + '\'' +
                 ", nombre='" + getNombre() + " " + getApellido() + '\'' +
                 ", email='" + getEmail() + '\'' +
