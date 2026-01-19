@@ -3,17 +3,54 @@ package repositorio;
 import dominio.Administrador;
 import util.FicheroUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class AdministradorRepositorio
         implements IRepositorioExtend<Administrador, String> {
 
-    private final String RUTA = "administradores.dat";
+    private final String RUTA = "administradores.txt";
     private List<Administrador> administradores;
 
     public AdministradorRepositorio() {
-        administradores = FicheroUtil.leerFichero(RUTA);
+        cargarAdministradores();
+    }
+
+    private void cargarAdministradores() {
+        administradores = new ArrayList<>();
+        List<String> lineas = FicheroUtil.leerFichero(RUTA);
+
+        for (String linea : lineas) {
+            String[] d = linea.split(";");
+
+            Administrador a = new Administrador(
+                    d[0], d[1], d[2], d[3], d[4],
+                    Double.parseDouble(d[5])
+            );
+
+            a.setActivo(Boolean.parseBoolean(d[6]));
+            administradores.add(a);
+        }
+    }
+
+    private void guardarAdministradores() {
+        List<String> lineas = new ArrayList<>();
+
+        for (Administrador a : administradores) {
+            String linea =
+                    a.getIdEmpleado() + ";" +
+                            a.getDepartamento() + ";" +
+                            a.getNombre() + ";" +
+                            a.getApellido() + ";" +
+                            a.getEmail() + ";" +
+                            a.getSalario() + ";" +
+                            a.isActivo();
+
+            lineas.add(linea);
+        }
+
+        FicheroUtil.escribirFichero(RUTA, lineas);
     }
 
     @Override
@@ -59,13 +96,13 @@ public class AdministradorRepositorio
     @Override
     public Administrador save(Administrador entity) {
 
-        Administrador a = findById(entity.getIdEmpleado());
-        if (a != null) {
-            administradores.remove(a);
+        Administrador existente = findById(entity.getIdEmpleado());
+        if (existente != null) {
+            administradores.remove(existente);
         }
 
         administradores.add(entity);
-        FicheroUtil.escribirFichero(RUTA, administradores);
+        guardarAdministradores();
         return entity;
     }
 
@@ -74,14 +111,14 @@ public class AdministradorRepositorio
         Administrador a = findById(id);
         if (a != null) {
             administradores.remove(a);
-            FicheroUtil.escribirFichero(RUTA, administradores);
+            guardarAdministradores();
         }
     }
 
     @Override
     public void deleteAll() {
         administradores.clear();
-        FicheroUtil.escribirFichero(RUTA, administradores);
+        guardarAdministradores();
     }
 
     // 🔹 MÉTODO PROPIO

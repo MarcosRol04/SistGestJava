@@ -10,12 +10,60 @@ import java.util.Optional;
 public class EmpleadoRepositorio
         implements IRepositorioExtend<Empleado, String> {
 
-    private final String RUTA = "empleados.dat";
+    private final String RUTA = "empleados.txt";
     private List<Empleado> empleados;
 
     public EmpleadoRepositorio() {
-        empleados = FicheroUtil.leerFichero(RUTA);
+        cargarEmpleados();
     }
+
+    // ================= CARGA Y GUARDADO =================
+
+    private void cargarEmpleados() {
+        empleados = new ArrayList<>();
+        List<String> lineas = FicheroUtil.leerFichero(RUTA);
+
+        for (String linea : lineas) {
+            String[] d = linea.split(";");
+
+            Empleado e = new Empleado(
+                    d[0],              // id
+                    d[1],              // departamento
+                    d[2],              // nombre
+                    d[3],              // apellido
+                    d[4],              // email
+                    Double.parseDouble(d[5]) // salario
+            );
+
+            e.setActivo(Boolean.parseBoolean(d[6]));
+            e.ficharHoras(Double.parseDouble(d[7]));
+
+            empleados.add(e);
+        }
+    }
+
+    private void guardarEmpleados() {
+        List<String> lineas = new ArrayList<>();
+
+        for (Empleado e : empleados) {
+            String linea =
+                    e.getIdEmpleado() + ";" +
+                            e.getDepartamento() + ";" +
+                            e.getNombre() + ";" +
+                            e.getApellido() + ";" +
+                            e.getEmail() + ";" +
+                            e.getSalario() + ";" +
+                            e.isActivo() + ";" +
+                            e.getHorasDia() + ";" +
+                            e.getHorasExtra();
+
+            lineas.add(linea);
+        }
+
+        FicheroUtil.escribirFichero(RUTA, lineas);
+    }
+
+    // ================= CRUD =================
 
     @Override
     public long count() {
@@ -66,7 +114,7 @@ public class EmpleadoRepositorio
         }
 
         empleados.add(entity);
-        FicheroUtil.escribirFichero(RUTA, empleados);
+        guardarEmpleados();
         return entity;
     }
 
@@ -75,17 +123,17 @@ public class EmpleadoRepositorio
         Empleado e = findById(id);
         if (e != null) {
             empleados.remove(e);
-            FicheroUtil.escribirFichero(RUTA, empleados);
+            guardarEmpleados();
         }
     }
 
     @Override
     public void deleteAll() {
         empleados.clear();
-        FicheroUtil.escribirFichero(RUTA, empleados);
+        guardarEmpleados();
     }
 
-    // 🔹 MÉTODO PROPIO (OBLIGATORIO)
+    // 🔹 MÉTODO PROPIO
     public List<Empleado> findEmpleadosActivos() {
         List<Empleado> activos = new ArrayList<>();
 

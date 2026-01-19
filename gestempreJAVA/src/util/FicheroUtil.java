@@ -6,33 +6,44 @@ import java.util.List;
 
 public class FicheroUtil {
 
-    public static <T> List<T> leerFichero(String ruta) {
-        List<T> datos = new ArrayList<>();
+    public static List<String> leerFichero(String ruta) {
+
+        List<String> lineas = new ArrayList<>();
 
         try {
             File f = new File(ruta);
             if (!f.exists()) {
-                return datos;
+                return lineas;
             }
 
-            ObjectInputStream ois =
-                    new ObjectInputStream(new FileInputStream(f));
-            datos = (List<T>) ois.readObject();
-            ois.close();
+            BufferedReader br = new BufferedReader(new FileReader(f));
+            String linea;
 
-        } catch (Exception e) {
-            datos = new ArrayList<>();
+            while ((linea = br.readLine()) != null) {
+                lineas.add(linea);
+            }
+
+            br.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
-        return datos;
+        return lineas;
     }
 
-    public static <T> void escribirFichero(String ruta, List<T> datos) {
+    public static void escribirFichero(String ruta, List<String> lineas) {
+
         try {
-            ObjectOutputStream oos =
-                    new ObjectOutputStream(new FileOutputStream(ruta));
-            oos.writeObject(datos);
-            oos.close();
+            BufferedWriter bw = new BufferedWriter(new FileWriter(ruta));
+
+            for (String linea : lineas) {
+                bw.write(linea);
+                bw.newLine();
+            }
+
+            bw.close();
+
         } catch (IOException e) {
             e.printStackTrace();
         }
