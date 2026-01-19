@@ -38,7 +38,7 @@ public class ControlHorarioService {
         e.ficharHoras(horas);
         empleadoRepo.save(e);
 
-        if (horas > 10) {
+        if (horas > 8) {
             Incidencia i = new Incidencia(
                     UUID.randomUUID().toString(),
                     idEmpleado,
