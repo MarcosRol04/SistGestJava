@@ -3,6 +3,7 @@ package repositorio;
 import dominio.Incidencia;
 import util.FicheroUtil;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,11 +11,54 @@ import java.util.Optional;
 public class IncidenciaRepositorio
         implements IRepositorioExtend<Incidencia, String> {
 
-    private final String RUTA = "incidencias.dat";
+    private final String RUTA = "incidencias.txt";
     private List<Incidencia> incidencias;
 
     public IncidenciaRepositorio() {
-        incidencias = FicheroUtil.leerFichero(RUTA);
+        cargarIncidencias();
+    }
+
+    private void cargarIncidencias() {
+        incidencias = new ArrayList<>();
+        List<String> lineas = FicheroUtil.leerFichero(RUTA);
+
+        for (String linea : lineas) {
+            String[] d = linea.split(";");
+
+            Incidencia i = new Incidencia(
+                    d[0], // id incidencia
+                    d[1], // id empleado
+                    d[3]  // motivo
+            );
+
+            if (d[2] != null && !d[2].isEmpty()) {
+                i = new Incidencia(d[0], d[1], d[3]);
+            }
+
+            if (Boolean.parseBoolean(d[4])) {
+                i.resolver(d[5]);
+            }
+
+            incidencias.add(i);
+        }
+    }
+
+    private void guardarIncidencias() {
+        List<String> lineas = new ArrayList<>();
+
+        for (Incidencia i : incidencias) {
+            String linea =
+                    i.getIdIncidencia() + ";" +
+                            i.getIdEmpleado() + ";" +
+                            i.getFecha() + ";" +
+                            i.getMotivo() + ";" +
+                            i.isRevisada() + ";" +
+                            i.getResolucion();
+
+            lineas.add(linea);
+        }
+
+        FicheroUtil.escribirFichero(RUTA, lineas);
     }
 
     @Override
@@ -60,7 +104,7 @@ public class IncidenciaRepositorio
     @Override
     public Incidencia save(Incidencia entity) {
         incidencias.add(entity);
-        FicheroUtil.escribirFichero(RUTA, incidencias);
+        guardarIncidencias();
         return entity;
     }
 
@@ -69,14 +113,14 @@ public class IncidenciaRepositorio
         Incidencia i = findById(id);
         if (i != null) {
             incidencias.remove(i);
-            FicheroUtil.escribirFichero(RUTA, incidencias);
+            guardarIncidencias();
         }
     }
 
     @Override
     public void deleteAll() {
         incidencias.clear();
-        FicheroUtil.escribirFichero(RUTA, incidencias);
+        guardarIncidencias();
     }
 
     // 🔹 MÉTODO PROPIO
